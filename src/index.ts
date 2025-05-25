@@ -9,6 +9,7 @@ import { Command } from "commander";
 import { version } from "../package.json";
 // 导入 create 命令的实现
 import { create } from "./command/create";
+import { update } from "./command/update";
 
 // 初始化命令行程序，设置程序名称为 "ronnie"
 const program = new Command("ronnie");
@@ -23,6 +24,13 @@ program
   .action((projectName) => {
     // 调用 create 函数处理创建项目的逻辑
     create(projectName);
+  });
+
+program
+  .command("update")
+  .description("更新ronnie-cli")
+  .action(() => {
+    update();
   });
 
 // 解析命令行参数并执行对应的命令

@@ -12,6 +12,14 @@
 npm install ronnie-cli -g
 ```
 
+### ☕ 更新
+
+```bash
+npm install -g ronnie-cli@latest
+# 或者
+ronnie update
+```
+
 ### 🎁 使用
 
 ```bash
