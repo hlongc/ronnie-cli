@@ -28,6 +28,7 @@
     "@types/node": "^22.15.21",
     "chalk": "^5.4.1",
     "commander": "^14.0.0",
+    "node-fetch": "^3.3.2",
     "progress-estimator": "^0.3.1",
     "rollup": "^4.41.0",
     "rollup-plugin-node-externals": "^5.1.2",

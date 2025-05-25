@@ -9,9 +9,9 @@ import { input, select } from "@inquirer/prompts";
 import { clone } from "../utils/clone";
 import path from "path";
 import fs from "fs";
-import { Chalk } from "chalk";
-
-const chalk = new Chalk({ level: 3 });
+import fetch from "node-fetch";
+import { name, version } from "../../package.json";
+import chalk from "../utils/chalk";
 
 /**
  * 模板信息接口定义
@@ -49,6 +49,30 @@ const templateMap: Map<string, TemplateInfo> = new Map([
   ],
 ]);
 
+async function getLatestVersion(packageName: string) {
+  const response = await fetch(`https://registry.npmjs.org/${packageName}`);
+  const data = (await response.json()) as any;
+  return data["dist-tags"].latest as string;
+}
+
+/**
+ * 检查当前版本是否过时
+ */
+async function checkVersion() {
+  const latestVersion = await getLatestVersion(name);
+  if (latestVersion > version) {
+    console.log(
+      `当前版本 ${chalk.red(version)} 已过时，建议升级到最新版本 ${chalk.green(
+        latestVersion
+      )}`
+    );
+    console.log(
+      `可通过 ${chalk.green(
+        `npm install -g ${name}@latest`
+      )} 升级 或者 ${chalk.green(`ronnie update`)} 升级`
+    );
+  }
+}
 /**
  * 创建新项目的核心函数
  * @param projectName - 可选的项目名称，如果未提供则会通过交互式提示获取
@@ -57,8 +81,10 @@ export async function create(projectName?: string) {
   // 如果未提供项目名称，则通过交互式提示获取
   if (!projectName) {
     projectName = await input({ message: "请输入项目名称", required: true });
-    console.log(projectName);
   }
+
+  // 检查更新
+  await checkVersion();
 
   const targetPath = path.resolve(process.cwd(), projectName);
   if (fs.existsSync(targetPath)) {

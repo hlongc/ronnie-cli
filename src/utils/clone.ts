@@ -9,10 +9,7 @@ import { simpleGit, SimpleGitOptions } from "simple-git";
 import os from "os";
 // 导入进度估算器，用于显示克隆进度
 import createLogger from "progress-estimator";
-// 导入 chalk 库，用于命令行输出着色
-import { Chalk } from "chalk";
-
-const chalk = new Chalk({ level: 3 });
+import chalk from "./chalk";
 
 /**
  * 创建进度日志记录器
