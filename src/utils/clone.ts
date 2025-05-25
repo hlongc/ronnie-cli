@@ -9,6 +9,8 @@ import { simpleGit, SimpleGitOptions } from "simple-git";
 import os from "os";
 // 导入进度估算器，用于显示克隆进度
 import createLogger from "progress-estimator";
+import figlet from "figlet";
+import log from "./log";
 import chalk from "./chalk";
 
 /**
@@ -36,6 +38,13 @@ const gitOptions: Partial<SimpleGitOptions> = {
   trimmed: false, // 是否修剪输出结果
 };
 
+async function printer() {
+  const data = await figlet.text("ronnie-cli", {
+    font: "Standard",
+  });
+  console.log(chalk.bgBlueBright(data));
+}
+
 /**
  * 克隆远程 Git 仓库到本地
  *
@@ -61,14 +70,15 @@ export async function clone(
 
     // 克隆成功后的提示信息
     console.log();
-    console.log(`${chalk.green("下载成功")}`);
+    log.success(`${chalk.green("下载成功")}`);
     console.log(chalk.blackBright("========================"));
     console.log(chalk.blackBright("===感谢使用ronnie-cli==="));
     console.log(chalk.blackBright("========================"));
-    console.log();
+
+    await printer();
   } catch (e) {
     // 克隆失败时的错误处理
-    console.error(chalk.red("下载失败"));
+    log.error(chalk.red("下载失败"));
     console.log(e);
   }
 }

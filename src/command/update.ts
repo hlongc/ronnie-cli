@@ -1,6 +1,7 @@
 import ora from "ora";
 import process from "child_process";
 import chalk from "../utils/chalk";
+import log from "../utils/log";
 
 const spinner = ora({
   text: "ronnie-cli 正在更新中...",
@@ -19,9 +20,9 @@ export async function update() {
   process.exec("npm install -g ronnie-cli@latest", (err) => {
     spinner.stop();
     if (err) {
-      console.log(chalk.red("更新失败"));
+      log.error(chalk.red("更新失败"));
     } else {
-      console.log(chalk.green("更新完成"));
+      log.success(chalk.green("更新完成"));
     }
   });
 }
