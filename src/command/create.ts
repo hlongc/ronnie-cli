@@ -7,6 +7,11 @@
 import { input, select } from "@inquirer/prompts";
 // 导入克隆工具函数
 import { clone } from "../utils/clone";
+import path from "path";
+import fs from "fs";
+import { Chalk } from "chalk";
+
+const chalk = new Chalk({ level: 3 });
 
 /**
  * 模板信息接口定义
@@ -53,6 +58,24 @@ export async function create(projectName?: string) {
   if (!projectName) {
     projectName = await input({ message: "请输入项目名称", required: true });
     console.log(projectName);
+  }
+
+  const targetPath = path.resolve(process.cwd(), projectName);
+  if (fs.existsSync(targetPath)) {
+    console.log(chalk.red(`项目 ${projectName} 已存在`));
+    const goon = await select({
+      message: "项目已存在，是否进行覆盖？",
+      choices: [
+        { name: "覆盖", value: true },
+        { name: "取消", value: false },
+      ],
+    });
+    if (goon) {
+      fs.rmSync(targetPath, { recursive: true, force: true });
+    } else {
+      console.log(chalk.red("取消创建"));
+      return;
+    }
   }
 
   // 将模板映射转换为选择列表格式
