@@ -10,6 +10,10 @@ import { version } from "../package.json";
 // 导入 create 命令的实现
 import { create } from "./command/create";
 import { update } from "./command/update";
+import { setupSignalHandlers } from "./utils/signal-handler";
+
+// 设置信号处理器，必须在程序开始时调用
+setupSignalHandlers();
 
 // 初始化命令行程序，设置程序名称为 "ronnie"
 const program = new Command("ronnie");
