@@ -4,7 +4,7 @@
   "description": "ronnie-cli",
   "main": "index.js",
   "bin": {
-    "ronnie": "./bin/index.js"
+    "ronnie": "bin/index.js"
   },
   "scripts": {
     "build": "rollup -c rollup.config.js --bundleConfigAsCjs"
