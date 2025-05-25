@@ -1,13 +1,24 @@
 {
   "name": "ronnie-cli",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "ronnie-cli",
   "main": "index.js",
+  "bin": {
+    "ronnie": "./bin/index.js"
+  },
   "scripts": {
     "build": "rollup -c rollup.config.js --bundleConfigAsCjs"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "ronnie",
+    "ronnie-cli"
+  ],
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ],
+  "author": "ronnie",
   "license": "ISC",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",
