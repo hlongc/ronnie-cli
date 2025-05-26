@@ -22,9 +22,8 @@ program.version(version, "-v,--version");
 
 // 定义 create 子命令
 program
-  .command("create")
-  .description("创建一个新项目")
-  .argument("name", "项目名称")
+  .command("create [project-name]")
+  .description("create a new project powered by ronnie-cli")
   .action((projectName) => {
     // 调用 create 函数处理创建项目的逻辑
     create(projectName);

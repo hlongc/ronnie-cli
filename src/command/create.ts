@@ -4,11 +4,11 @@
  */
 
 // 导入交互式命令行提示工具
-import { input, select } from "@inquirer/prompts";
+import { input, select, confirm } from "@inquirer/prompts";
 // 导入克隆工具函数
 import { clone } from "../utils/clone";
 import path from "path";
-import fs from "fs";
+import fs from "fs-extra";
 import fetch from "node-fetch";
 import { name, version } from "../../package.json";
 import chalk from "../utils/chalk";
@@ -80,27 +80,55 @@ async function checkVersion() {
 export async function create(projectName?: string) {
   // 如果未提供项目名称，则通过交互式提示获取
   if (!projectName) {
-    projectName = await input({ message: "请输入项目名称", required: true });
+    projectName = (
+      await input({
+        message: "请输入项目名称",
+        required: true,
+        validate: (value) => {
+          if (!value.trim()) {
+            return "项目名称不能为空";
+          }
+          return true;
+        },
+      })
+    ).trim();
   }
 
   // 检查更新
   await checkVersion();
 
+  const isCurrentDir = projectName === ".";
+  projectName = isCurrentDir ? path.resolve("../", process.cwd()) : projectName;
+
   const targetPath = path.resolve(process.cwd(), projectName);
+
   if (fs.existsSync(targetPath)) {
-    console.log(chalk.red(`项目 ${projectName} 已存在`));
-    const goon = await select({
-      message: "项目已存在，是否进行覆盖？",
-      choices: [
-        { name: "覆盖", value: true },
-        { name: "取消", value: false },
-      ],
-    });
-    if (goon) {
-      fs.rmSync(targetPath, { recursive: true, force: true });
+    if (isCurrentDir) {
+      const ensure = await confirm({
+        message: "确定在当前目录创建项目吗？会进行覆盖操作",
+        default: true,
+      });
+      if (ensure) {
+        fs.emptyDirSync(targetPath);
+      } else {
+        console.log(chalk.red("取消创建"));
+        return;
+      }
     } else {
-      console.log(chalk.red("取消创建"));
-      return;
+      console.log(chalk.red(`项目 ${projectName} 已存在`));
+      const goon = await select({
+        message: "项目已存在，是否进行覆盖？",
+        choices: [
+          { name: "覆盖", value: true },
+          { name: "取消", value: false },
+        ],
+      });
+      if (goon) {
+        fs.rmSync(targetPath, { recursive: true, force: true });
+      } else {
+        console.log(chalk.red("取消创建"));
+        return;
+      }
     }
   }
 
