@@ -90,7 +90,7 @@ jobs:
           git push --tags
 
       - name: 发布到 NPM
-        run: npm publish --no-git-checks
+        run: pnpm publish --no-git-checks
         env:
           # 这里需要设置 NPM 的认证 token
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
