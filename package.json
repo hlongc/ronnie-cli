@@ -3,6 +3,7 @@
   "version": "0.0.8",
   "description": "ronnie-cli",
   "main": "index.js",
+  "upgrade": "patch",
   "bin": {
     "ronnie": "bin/index.js"
   },

@@ -1,0 +1,83 @@
+name: 自动版本升级与发布
+
+on:
+  push:
+    branches:
+      - publish
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: "版本升级类型 (major, minor, patch)"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+        with:
+          # 确保获取完整的 git 历史，以便正确更新版本
+          fetch-depth: 0
+          # 确保可以推送回仓库
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: 配置 Git 用户
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "github-actions-bot@users.noreply.github.com"
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 确定版本升级类型
+        id: version_type
+        run: |
+          # 如果是通过 workflow_dispatch 触发，则使用输入的版本类型
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "VERSION_TYPE=${{ github.event.inputs.version_type }}" >> $GITHUB_ENV
+          else
+            # 从 package.json 读取升级策略
+            UPGRADE_STRATEGY=$(node -e "try { const pkg = require('./package.json'); console.log(pkg.upgrade || 'patch'); } catch(e) { console.log('patch'); }")
+            
+            # 验证升级策略是否有效
+            if [[ "$UPGRADE_STRATEGY" != "major" && "$UPGRADE_STRATEGY" != "minor" && "$UPGRADE_STRATEGY" != "patch" ]]; then
+              echo "package.json 中的 upgrade 字段值无效: $UPGRADE_STRATEGY，将使用默认值 'patch'"
+              UPGRADE_STRATEGY="patch"
+            fi
+            
+            echo "从 package.json 中读取升级策略: $UPGRADE_STRATEGY"
+            echo "VERSION_TYPE=$UPGRADE_STRATEGY" >> $GITHUB_ENV
+          fi
+
+      - name: 升级版本号
+        run: |
+          # 使用 npm version 命令升级版本号
+          # 这会自动创建一个包含新版本号的 git 标签
+          npm version ${{ env.VERSION_TYPE }} -m "Bump version to %s [skip ci]"
+
+      - name: 构建项目
+        run: npm run build
+
+      - name: 推送版本变更到 GitHub
+        run: |
+          git push
+          git push --tags
+
+      - name: 发布到 NPM
+        run: npm publish
+        env:
+          # 这里需要设置 NPM 的认证 token
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
