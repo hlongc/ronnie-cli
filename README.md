@@ -23,5 +23,6 @@ ronnie update
 ### 🎁 使用
 
 ```bash
-ronnie create <projectName>
+ronnie create [projectName]
+ronnie create . # 在当前目录创建
 ```
