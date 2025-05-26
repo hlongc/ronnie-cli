@@ -9,9 +9,11 @@ import { simpleGit, SimpleGitOptions } from "simple-git";
 import os from "os";
 // 导入进度估算器，用于显示克隆进度
 import createLogger from "progress-estimator";
+import fs from "fs-extra";
 import figlet from "figlet";
 import log from "./log";
 import chalk from "./chalk";
+import path from "path";
 
 /**
  * 创建进度日志记录器
@@ -55,7 +57,8 @@ async function printer() {
 export async function clone(
   url: string,
   projectName: string,
-  options: string[]
+  options: string[],
+  shouldInit: boolean
 ) {
   try {
     // 初始化 Git 实例
@@ -71,6 +74,22 @@ export async function clone(
     // 克隆成功后的提示信息
     console.log();
     log.success(`${chalk.green("下载成功")}`);
+
+    const gitDir = path.join(process.cwd(), projectName, ".git");
+    if (fs.existsSync(gitDir)) {
+      fs.rmSync(gitDir, { recursive: true, force: true });
+    }
+
+    if (shouldInit) {
+      const projectPath = path.join(process.cwd(), projectName);
+      const projectGit = simpleGit({ baseDir: projectPath });
+
+      await logger(projectGit.init(), chalk.blueBright("初始化 Git 仓库..."), {
+        estimate: 1500,
+      });
+      console.log(chalk.green("初始化 Git 仓库成功"));
+    }
+
     console.log(chalk.blackBright("========================"));
     console.log(chalk.blackBright("===感谢使用ronnie-cli==="));
     console.log(chalk.blackBright("========================"));

@@ -145,10 +145,22 @@ export async function create(projectName?: string) {
 
   // 通过交互式提示选择项目模板
   const template = await select({ message: "请选择模板", choices });
+  const shouldInit = await select({
+    message: "是否初始化 Git 仓库",
+    choices: [
+      { name: "是", value: true },
+      { name: "否", value: false },
+    ],
+  });
   // 获取选定模板的详细信息
   const templateInfo = templateMap.get(template);
   // 如果找到模板信息，则执行克隆操作
   if (templateInfo) {
-    clone(templateInfo.git, projectName, ["-b", templateInfo.branch]);
+    clone(
+      templateInfo.git,
+      projectName,
+      ["-b", templateInfo.branch, "--depth=1"],
+      shouldInit
+    );
   }
 }
