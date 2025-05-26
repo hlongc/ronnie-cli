@@ -34,13 +34,19 @@ jobs:
           node-version: "18"
           registry-url: "https://registry.npmjs.org"
 
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8 # 使用最新的 pnpm v8，您可以根据需要调整版本
+
       - name: 配置 Git 用户
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "github-actions-bot@users.noreply.github.com"
 
       - name: 安装依赖
-        run: npm ci
+        run: pnpm install --frozen-lockfile
+        # 添加 --frozen-lockfile 参数确保不会修改 pnpm-lock.yaml
 
       - name: 确定版本升级类型
         id: version_type
@@ -64,12 +70,11 @@ jobs:
 
       - name: 升级版本号
         run: |
-          # 使用 npm version 命令升级版本号
-          # 这会自动创建一个包含新版本号的 git 标签
-          npm version ${{ env.VERSION_TYPE }} -m "Bump version to %s [skip ci]"
+          # 使用 pnpm 的版本命令升级版本号
+          pnpm version ${{ env.VERSION_TYPE }} -m "Bump version to %s [skip ci]"
 
       - name: 构建项目
-        run: npm run build
+        run: pnpm run build
 
       - name: 推送版本变更到 GitHub
         run: |
@@ -77,7 +82,7 @@ jobs:
           git push --tags
 
       - name: 发布到 NPM
-        run: npm publish
+        run: npm publish --no-git-checks
         env:
           # 这里需要设置 NPM 的认证 token
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
