@@ -9,9 +9,9 @@ import { input, select, confirm } from "@inquirer/prompts";
 import { clone } from "../utils/clone";
 import path from "path";
 import fs from "fs-extra";
-import fetch from "node-fetch";
 import { name, version } from "../../package.json";
 import chalk from "../utils/chalk";
+import { getLatestVersion } from "../utils/getLatestVersion";
 
 /**
  * 模板信息接口定义
@@ -48,12 +48,6 @@ const templateMap: Map<string, TemplateInfo> = new Map([
     },
   ],
 ]);
-
-async function getLatestVersion(packageName: string) {
-  const response = await fetch(`https://registry.npmjs.org/${packageName}`);
-  const data = (await response.json()) as any;
-  return data["dist-tags"].latest as string;
-}
 
 /**
  * 检查当前版本是否过时
