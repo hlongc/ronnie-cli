@@ -16,6 +16,7 @@
   "files": [
     "dist",
     "bin",
+    "fonts",
     "README.md"
   ],
   "author": "ronnie",
