@@ -16,6 +16,11 @@ on:
           - minor
           - patch
 
+# 明确定义工作流需要的权限
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -25,8 +30,10 @@ jobs:
         with:
           # 确保获取完整的 git 历史，以便正确更新版本
           fetch-depth: 0
-          # 确保可以推送回仓库
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # 使用个人访问令牌 (PAT) 而不是默认的 GITHUB_TOKEN
+          token: ${{ secrets.GH_PAT }}
+          # 如果您没有设置 GH_PAT，请创建一个具有 repo 权限的个人访问令牌
+          # 并将其添加到仓库的 Secrets 中
 
       - name: 设置 Node.js
         uses: actions/setup-node@v3
@@ -78,7 +85,8 @@ jobs:
 
       - name: 推送版本变更到 GitHub
         run: |
-          git push
+          # 确保使用正确的凭据推送
+          git push origin HEAD:publish
           git push --tags
 
       - name: 发布到 NPM
