@@ -3,7 +3,7 @@ name: 自动版本升级与发布
 on:
   push:
     branches:
-      - publish
+      - main
   workflow_dispatch:
     inputs:
       version_type:
