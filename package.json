@@ -10,7 +10,8 @@
   "scripts": {
     "build": "rollup -c rollup.config.js --bundleConfigAsCjs",
     "prepare": "husky install",
-    "postinstall": "node scripts/setup-hooks.js"
+    "postinstall": "node scripts/setup-hooks.js",
+    "prepublishOnly": "node scripts/pre-publish.js"
   },
   "keywords": [
     "ronnie",
